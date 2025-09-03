@@ -39,7 +39,16 @@ async function upsertAction(formData: FormData) {
 
   const values = parsed.data
   const supabase = await createClient()
-  const payload: any = {
+  type ServiceTimeUpsert = {
+    service_name: string
+    day_of_week: string
+    time: string
+    location: string | null
+    description: string | null
+    display_order: number
+    is_active: boolean
+  }
+  const payload: ServiceTimeUpsert = {
     service_name: values.service_name,
     day_of_week: values.day_of_week,
     time: values.time,
