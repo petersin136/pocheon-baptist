@@ -18,7 +18,7 @@ export default async function Index() {
     .order('display_order')
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen -mt-28 md:-mt-32">
       {/* Hero 섹션 - HTB 스타일 */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* 배경 영상 */}
@@ -29,8 +29,7 @@ export default async function Index() {
             muted
             loop
             playsInline
-            preload="auto"
-            poster={siteSettings?.hero_image_url || 'https://images.unsplash.com/photo-1507692049790-de58290a4334?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'}
+            preload="metadata"
           >
             <source src="https://bvhqpdtajkluuowjrkly.supabase.co/storage/v1/object/public/hero-videos/203678-922748476_medium.mp4" type="video/mp4" />
           </video>
@@ -43,10 +42,10 @@ export default async function Index() {
         
         {/* 히어로 콘텐츠 */}
         <div className="relative z-20 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-up">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-up whitespace-pre-wrap">
             {siteSettings?.main_slogan || '오직 예수! 오직 전도!'}
           </h1>
-          <p className="text-xl md:text-2xl lg:text-3xl mb-8 text-white/90 animate-fade-up animation-delay-300">
+          <p className="text-xl md:text-2xl lg:text-3xl mb-8 text-white/90 animate-fade-up animation-delay-300 whitespace-pre-wrap">
             {siteSettings?.welcome_message || '하나님을 예배하고 이웃을 섬기는 포천중앙침례교회에 오신 것을 환영합니다.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up animation-delay-600">

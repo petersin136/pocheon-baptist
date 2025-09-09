@@ -15,7 +15,7 @@ export const metadata = {
 
 function Header() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md transition-all duration-300 ease-in-out">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md transition-all duration-300 ease-in-out">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* 로고 */}
@@ -72,7 +72,6 @@ function Header() {
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
                 <div className="py-2">
                   <Link href="/sermons" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">최근 설교</Link>
-                  <Link href="/sermon-series" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">설교 시리즈</Link>
                 </div>
               </div>
             </div>
@@ -129,14 +128,30 @@ function Header() {
             </a>
           </div>
 
-          {/* 모바일 메뉴 버튼 */}
-          <div className="lg:hidden">
-            <button className="text-white hover:text-yellow-400 transition-colors duration-200">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* 모바일 메뉴 */}
+          <details className="lg:hidden relative">
+            <summary className="list-none cursor-pointer text-white hover:text-yellow-400 transition-colors duration-200 flex items-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="모바일 메뉴 열기">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-            </button>
-          </div>
+            </summary>
+            <nav className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-50">
+              <div className="px-3 py-2 text-xs font-medium text-gray-400">교회소개</div>
+              <Link href="/about" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">인사말</Link>
+              <Link href="/vision" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">비전·표어</Link>
+              <Link href="/staff" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">담임목사·리더십</Link>
+              <Link href="/location" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">찾아오는 길</Link>
+              <div className="my-2 h-px bg-gray-100" />
+              <div className="px-3 py-2 text-xs font-medium text-gray-400">예배안내</div>
+              <Link href="/services" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">예배시간</Link>
+              <Link href="/newcomers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">처음 오시는 분들께</Link>
+              <div className="my-2 h-px bg-gray-100" />
+              <div className="px-3 py-2 text-xs font-medium text-gray-400">말씀/설교</div>
+              <Link href="/sermons" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">최근 설교</Link>
+              <div className="my-2 h-px bg-gray-100" />
+              <Link href="/gallery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">갤러리</Link>
+            </nav>
+          </details>
         </div>
       </div>
     </header>
@@ -158,7 +173,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="min-h-screen">
+          <main className="min-h-screen pt-28 md:pt-32">
             {children}
           </main>
         </ThemeProvider>
