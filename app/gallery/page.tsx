@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 type Category = {
   slug: string
@@ -25,7 +26,9 @@ type GalleryItem = {
   caption?: string
 }
 
-async function listCategoryImages(supabase: any, category: Category): Promise<GalleryItem[]> {
+interface StorageItem { name: string; updated_at?: string }
+
+async function listCategoryImages(supabase: SupabaseClient, category: Category): Promise<GalleryItem[]> {
   try {
     const base = supabase.storage.from('assets')
     const listPath = category.path || ''
@@ -39,15 +42,15 @@ async function listCategoryImages(supabase: any, category: Category): Promise<Ga
       return []
     }
     const items: GalleryItem[] = (data || [])
-      .filter((x: any) => x?.name)
-      .map((file: any) => {
+      .filter((x: StorageItem) => x?.name)
+      .map((file: StorageItem) => {
         const full = category.path ? `${category.path}/${file.name}` : file.name
         const { data: pub } = base.getPublicUrl(full)
         return {
           url: pub.publicUrl,
           path: full,
-          name: file.name as string,
-          updatedAt: (file as any)?.updated_at ?? undefined,
+          name: file.name,
+          updatedAt: file?.updated_at ?? undefined,
         }
       })
 
@@ -79,7 +82,7 @@ export const metadata = {
   title: '갤러리 | 포천중앙침례교회',
 }
 
-async function getCaptionsFor(items: GalleryItem[], supabase: any): Promise<Record<string, string>> {
+async function getCaptionsFor(items: GalleryItem[], supabase: SupabaseClient): Promise<Record<string, string>> {
   const meta = supabase.storage.from('assets')
   const result: Record<string, string> = {}
   for (const it of items) {
@@ -96,7 +99,9 @@ async function getCaptionsFor(items: GalleryItem[], supabase: any): Promise<Reco
   return result
 }
 
-async function getComments(imagePath?: string) {
+interface GalleryComment { id: string | number; display_name: string | null; content: string; created_at: string; image_path?: string | null }
+
+async function getComments(imagePath?: string): Promise<GalleryComment[]> {
   try {
     const supabase = await createClient()
     // Try select with image_path if column exists
@@ -107,7 +112,7 @@ async function getComments(imagePath?: string) {
     if (imagePath) query = query.eq('image_path', imagePath)
     const { data, error } = await query
     if (error) return []
-    return data ?? []
+    return (data ?? []) as unknown as GalleryComment[]
   } catch {
     return []
   }
@@ -133,21 +138,7 @@ async function addComment(formData: FormData) {
   revalidatePath('/gallery')
 }
 
-async function saveCaption(formData: FormData) {
-  'use server'
-  const imagePath = String(formData.get('image_path') || '')
-  const caption = String(formData.get('caption') || '')
-  if (!imagePath) return
-  try {
-    const supabase = await createClient()
-    const meta = supabase.storage.from('assets')
-    const blob = new Blob([caption], { type: 'text/plain; charset=utf-8' })
-    await meta.upload(`${imagePath}.txt`, blob, { upsert: true })
-  } catch (e) {
-    console.error('save caption failed', e)
-  }
-  revalidatePath('/gallery')
-}
+// caption 저장은 관리자 페이지에서 처리합니다(사용 안 함)
 
 export default async function GalleryPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const supabase = await createClient()
