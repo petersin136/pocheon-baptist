@@ -142,6 +142,7 @@ async function addComment(formData: FormData) {
 
 export default async function GalleryPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const supabase = await createClient()
+  const client = supabase as unknown as SupabaseClient
   const params = (await searchParams) || {}
   const currentSlug = (typeof params?.c === 'string' ? params.c : 'all') || 'all'
   const pageParam = (typeof params?.page === 'string' ? params.page : '1') || '1'
@@ -152,12 +153,12 @@ export default async function GalleryPage({ searchParams }: { searchParams?: Pro
 
   let items: GalleryItem[] = []
   if (current.slug === 'all') {
-    const lists = await Promise.all(CATEGORIES.filter((c) => c.slug !== 'all').map((c) => listCategoryImages(supabase, c)))
+    const lists = await Promise.all(CATEGORIES.filter((c) => c.slug !== 'all').map((c) => listCategoryImages(client, c)))
     items = lists.flat()
     // 최신순으로 한 번 더 정렬
     items.sort((a, b) => (a.updatedAt && b.updatedAt ? (a.updatedAt > b.updatedAt ? -1 : 1) : a.name > b.name ? -1 : 1))
   } else {
-    items = await listCategoryImages(supabase as any, current)
+    items = await listCategoryImages(client, current)
   }
 
   const total = items.length
@@ -171,14 +172,14 @@ export default async function GalleryPage({ searchParams }: { searchParams?: Pro
   }
 
   // fetch captions for current page items
-  const captions = await getCaptionsFor(pageItems, supabase)
+  const captions = await getCaptionsFor(pageItems, client)
   pageItems = pageItems.map((it) => ({ ...it, caption: captions[it.path] }))
 
   // If single view mode
   if (viewPath) {
-    const meta = supabase.storage.from('assets')
+    const meta = client.storage.from('assets')
     const { data: pub } = meta.getPublicUrl(viewPath)
-    const capMap = await getCaptionsFor([{ url: '', path: viewPath, name: '' }], supabase)
+    const capMap = await getCaptionsFor([{ url: '', path: viewPath, name: '' }], client)
     const thisCaption = capMap[viewPath]
     const comments = await getComments(viewPath)
     // Prev/Next within current items
@@ -225,7 +226,7 @@ export default async function GalleryPage({ searchParams }: { searchParams?: Pro
               <button type="submit" className="h-[42px] px-4 rounded-md bg-gray-900 text-white text-sm font-semibold hover:bg-black">등록</button>
             </form>
             <div className="mt-6 space-y-4">
-              {comments.map((c: any) => (
+              {comments.map((c: GalleryComment) => (
                 <div key={c.id} className="rounded-xl bg-white border border-gray-200 p-4">
                   <div className="text-sm text-gray-900 font-medium">{c.display_name || '익명'}</div>
                   <div className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{c.content}</div>
@@ -328,7 +329,7 @@ export default async function GalleryPage({ searchParams }: { searchParams?: Pro
             <button type="submit" className="h-[42px] px-4 rounded-md bg-gray-900 text-white text-sm font-semibold hover:bg-black">등록</button>
           </form>
           <div className="mt-6 space-y-4">
-            {comments.map((c: any) => (
+            {comments.map((c: GalleryComment) => (
               <div key={c.id} className="rounded-xl bg-white border border-gray-100 p-4">
                 <div className="text-sm text-gray-900 font-medium">{c.display_name || '익명'}</div>
                 <div className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">{c.content}</div>
